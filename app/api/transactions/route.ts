@@ -25,13 +25,13 @@ export async function GET(request:NextRequest){
   const key=process.env.PUBLIC_DATA_PORTAL_KEY;
   if(!key)return NextResponse.json({ok:false,source:"fallback",message:"API 키가 설정되지 않았습니다."});
   try{
-    const monthKeys=monthsEndingAt(ym,monthCount),monthRows=await Promise.all(monthKeys.map(keyMonth=>fetchMonth(key,keyMonth))),rows=monthRows.flat(),latestRows=monthRows.at(-1)||[];
+    const monthKeys=monthsEndingAt(ym,monthCount),monthRows=await Promise.all(monthKeys.map(keyMonth=>fetchMonth(key,keyMonth))),rows=monthRows.flat(),latestRows=monthRows.at(-1)||[],misaDongs=new Set(["망월동","풍산동","선동"]);
     const grouped=new Map<string,{apartment:string;dong:string;latest:number;count:number;area:number}>();
     for(const row of latestRows){const old=grouped.get(row.apartment);grouped.set(row.apartment,{apartment:row.apartment,dong:row.dong,latest:row.amount,count:(old?.count||0)+1,area:row.area||old?.area||0})}
     const dongMap=new Map<string,number>();for(const row of rows)dongMap.set(row.dong,(dongMap.get(row.dong)||0)+1);
     const top=[...grouped.values()].sort((a,b)=>b.latest-a.latest).slice(0,10);
-    const monthly=monthKeys.map((keyMonth,index)=>({ym:keyMonth,label:monthLabel(keyMonth),count:monthRows[index].length}));
+    const monthly=monthKeys.map((keyMonth,index)=>({ym:keyMonth,label:monthLabel(keyMonth),count:monthRows[index].length})),misaMonthly=monthKeys.map((keyMonth,index)=>({ym:keyMonth,label:monthLabel(keyMonth),count:monthRows[index].filter(row=>misaDongs.has(row.dong)).length}));
     const dongCounts=[...dongMap.entries()].map(([dong,count])=>({dong,count})).sort((a,b)=>b.count-a.count);
-    return NextResponse.json({ok:true,source:"국토교통부 공공데이터포털",ym,total:latestRows.length,periodTotal:rows.length,monthly,dongCounts,top,updatedAt:new Date().toISOString()},{headers:{"Cache-Control":"public, max-age=900, s-maxage=1800"}});
+    return NextResponse.json({ok:true,source:"국토교통부 공공데이터포털",ym,total:latestRows.length,periodTotal:rows.length,misaPeriodTotal:misaMonthly.reduce((sum,item)=>sum+item.count,0),monthly,misaMonthly,dongCounts,top,updatedAt:new Date().toISOString()},{headers:{"Cache-Control":"public, max-age=900, s-maxage=1800"}});
   }catch(error){return NextResponse.json({ok:false,source:"fallback",message:error instanceof Error?error.message:"실거래 조회 실패"})}
 }
