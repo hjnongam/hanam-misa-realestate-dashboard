@@ -1,9 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ArrowDownRight, ArrowUpRight, Building2, Bus, CalendarDays, CarFront, Check, ChevronRight, Coffee, GraduationCap, Landmark, MapPin, Menu, Phone, Plus, RefreshCw, ShoppingBag, Sparkles, TrainFront, TrendingUp, X } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+
+const MisaMapPortal = dynamic(() => import("../components/misa-map"), { ssr: false });
 
 type DealType = "매매" | "전세" | "월세";
 type Period = "주간" | "월간" | "직접 지정";
@@ -78,6 +81,7 @@ export default function MisaDashboard(){
       <footer className="flex flex-col justify-between gap-4 border-t border-[#d8d2c8] py-7 text-xs text-slate-500 md:flex-row"><div><strong className="text-[#17243d]">센트럴자이 미사금호부동산</strong><span className="mx-2">·</span>Tel. 031-795-1149</div><p className="max-w-3xl leading-5">본 화면의 샘플 시세·매물은 브리핑 시연용이며 계약 전 등기·실거래·현장 확인이 필요합니다. 실거래 데이터는 국토교통부 공공데이터포털, 지표는 한국부동산원 R-ONE 연동 구조를 사용합니다.</p></footer>
     </div>
 
+    <MisaMapPortal apartments={filtered} selectedId={selected.id} dealType={dealType} onSelect={setSelectedId}/>
     {showForm&&<div className="fixed inset-0 z-[80] grid place-items-center bg-[#071229]/70 p-4 backdrop-blur-sm"><form onSubmit={addListing} className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8"><div className="flex items-center justify-between"><div><p className="eyebrow">NEW LISTING</p><h3 className="text-xl font-black">추천매물 추가</h3></div><button type="button" onClick={()=>setShowForm(false)} className="rounded-lg p-2 hover:bg-slate-100"><X/></button></div><div className="mt-6 grid gap-4 sm:grid-cols-2"><label className="form-field sm:col-span-2">단지<select name="aptId" defaultValue="1">{apartments.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></label><label className="form-field">거래유형<select name="type"><option>매매</option><option>전세</option><option>월세</option></select></label><label className="form-field">가격<input name="price" placeholder="예: 11억 5,000" required/></label><label className="form-field">면적<input name="area" defaultValue="84㎡" required/></label><label className="form-field">층수<input name="floor" placeholder="예: 12층" required/></label><label className="form-field sm:col-span-2">핵심 특징<input name="feature" placeholder="예: 남향 · 공원뷰 · 즉시입주" required/></label></div><button className="primary-button mt-6 w-full justify-center py-3"><Plus size={16}/>매물 카드 추가</button><p className="mt-3 text-center text-[11px] text-slate-400">추가한 매물은 현재 브라우저 세션에 표시됩니다.</p></form></div>}
   </main>
 }
