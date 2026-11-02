@@ -15,9 +15,9 @@ type LayerKey = "transport" | "school" | "commerce" | "development" | "radius";
 type MapStyleKey = "colorful" | "graybeard" | "eclipse";
 
 const STYLE_OPTIONS: { key: MapStyleKey; label: string; url: string }[] = [
-  { key: "colorful", label: "상세도로", url: "https://vector.openstreetmap.org/styles/shortbread/colorful.json" },
-  { key: "graybeard", label: "밝은지도", url: "https://vector.openstreetmap.org/styles/shortbread/graybeard.json" },
-  { key: "eclipse", label: "야간지도", url: "https://vector.openstreetmap.org/styles/shortbread/eclipse.json" },
+  { key: "colorful", label: "상세도로", url: "https://tiles.waymorphic.com/styles/bright" },
+  { key: "graybeard", label: "밝은지도", url: "https://tiles.waymorphic.com/styles/positron" },
+  { key: "eclipse", label: "야간지도", url: "https://tiles.waymorphic.com/styles/dark" },
 ];
 
 const pois = {
